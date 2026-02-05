@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/quiz-global9-unit7-8.html"
+        }
+    ]
+}

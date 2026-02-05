@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ezteach Quiz - Global 9 Unit 7 & 8</title>
+    <meta name="description" content="Bài kiểm tra trắc nghiệm Unit 7 & 8 - Global Success 9">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .option-btn {
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover:not(.selected) {
+            transform: translateX(8px);
+            border-color: #6366f1;
+            background-color: #eef2ff;
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        }
+
+        .score-circle {
+            background: conic-gradient(#6366f1 var(--score-percent), #e5e7eb 0deg);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: fall 3s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        .timer-warning {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8 max-w-2xl">
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-lg px-6 py-3 rounded-full mb-4">
+                <span class="text-3xl">📚</span>
+                <span class="text-white font-bold text-lg">Ezteach</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">
+                Unit 7 & 8: <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Natural Wonders
+                    & Tourism</span>
+            </h1>
+            <p class="text-indigo-200 text-sm">Global Success 9 - A Closer Look & Looking Back</p>
+        </header>
+
+        <!-- Locked Screen -->
+        <section id="lockedScreen" class="hidden">
+            <div class="glass-card rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-gray-600 to-gray-800 p-8 text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4">
+                        <span class="text-4xl">🔒</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Bài kiểm tra chưa mở</h2>
+                    <p class="text-gray-200">Vui lòng quay lại đúng giờ</p>
+                </div>
+                <div class="p-8 text-center">
+                    <div class="bg-indigo-50 rounded-2xl p-6 mb-6">
+                        <div class="text-lg text-gray-600 mb-2">⏰ Thời gian mở bài:</div>
+                        <div class="text-3xl font-extrabold text-indigo-600 mb-2">19:00 - Thứ Bảy</div>
+                        <div class="text-xl font-bold text-purple-600">08/02/2026</div>
+                    </div>
+                    <div id="countdownToOpen" class="text-gray-600">
+                        <div class="text-sm mb-2">Còn lại:</div>
+                        <div id="countdownDisplay" class="text-2xl font-bold text-indigo-600">--:--:--</div>
+                    </div>
+                    <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                        <p class="text-amber-800 text-sm">
+                            <span class="font-bold">⚠️ Lưu ý:</span> Bài kiểm tra chỉ mở trong <strong>30 phút</strong>.
+                            Hãy quay lại đúng giờ!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Expired Screen -->
+        <section id="expiredScreen" class="hidden">
+            <div class="glass-card rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-br from-red-500 to-red-700 p-8 text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4">
+                        <span class="text-4xl">⏰</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Đã hết thời gian</h2>
+                    <p class="text-red-100">Bài kiểm tra đã đóng</p>
+                </div>
+                <div class="p-8 text-center">
+                    <p class="text-gray-600 mb-4">Thời gian làm bài đã kết thúc.</p>
+                    <p class="text-gray-600">Vui lòng liên hệ giáo viên nếu bạn có lý do chính đáng.</p>
+                    <div class="mt-6 flex gap-3 justify-center">
+                        <a href="https://zalo.me/0914666040"
+                            class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all">💬
+                            Liên hệ Zalo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Start Screen -->
+        <section id="startScreen" class="hidden">
+            <div class="glass-card rounded-3xl shadow-2xl overflow-hidden">
+                <div class="gradient-bg p-8 text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4">
+                        <span class="text-4xl">🌍</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Sẵn sàng kiểm tra?</h2>
+                    <p class="text-indigo-100">20 câu hỏi • 15 phút</p>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center p-4 bg-indigo-50 rounded-2xl">
+                            <div class="text-2xl mb-1">📝</div>
+                            <div class="text-2xl font-bold text-indigo-600">20</div>
+                            <div class="text-xs text-gray-500">Câu hỏi</div>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 rounded-2xl">
+                            <div class="text-2xl mb-1">⏱️</div>
+                            <div class="text-2xl font-bold text-purple-600">15</div>
+                            <div class="text-xs text-gray-500">Phút</div>
+                        </div>
+                        <div class="text-center p-4 bg-pink-50 rounded-2xl">
+                            <div class="text-2xl mb-1">🎯</div>
+                            <div class="text-2xl font-bold text-pink-600">10</div>
+                            <div class="text-xs text-gray-500">Điểm tối đa</div>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                        <p class="text-amber-800 text-sm">
+                            <span class="font-bold">⚠️ Lưu ý:</span> Bài kiểm tra sẽ tự động nộp khi hết thời gian. Đáp
+                            án sẽ được giáo viên thông báo sau.
+                        </p>
+                    </div>
+                    <form id="studentForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">👤 Họ và tên học sinh</label>
+                            <input type="text" id="studentName" required
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none text-gray-700"
+                                placeholder="Nhập họ và tên...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">🏫 Lớp</label>
+                            <input type="text" id="studentClass" required
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none text-gray-700"
+                                placeholder="Ví dụ: 9A1">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">📱 Số điện thoại phụ huynh
+                                <span class="text-red-500">*</span></label>
+                            <input type="tel" id="parentPhone" required pattern="[0-9]{10,11}"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none text-gray-700"
+                                placeholder="Nhập SĐT cha/mẹ (VD: 0912345678)">
+                            <p class="text-xs text-gray-500 mt-1">Kết quả sẽ được gửi đến phụ huynh để xác nhận</p>
+                        </div>
+                        <button type="submit"
+                            class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">
+                            🚀 Bắt đầu làm bài
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quizScreen" class="hidden">
+            <div class="glass-card rounded-2xl p-4 mb-4 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">⏱️</span>
+                        <span class="text-gray-600 font-medium">Thời gian còn lại:</span>
+                    </div>
+                    <div id="timerDisplay" class="text-2xl font-bold text-indigo-600">15:00</div>
+                </div>
+                <div class="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="timerBar"
+                        class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-1000"
+                        style="width: 100%"></div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 mb-6 shadow-lg">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold"
+                            id="qNum">1</div>
+                        <div>
+                            <div class="text-sm text-gray-500">Câu hỏi</div>
+                            <div class="font-bold text-gray-800"><span id="currentQ">1</span>/20</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-500" id="dispName">Học sinh</div>
+                        <div class="text-xs text-indigo-600 font-medium" id="dispClass">Lớp 9</div>
+                    </div>
+                </div>
+                <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full progress-bar rounded-full transition-all duration-500"
+                        style="width: 5%"></div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl shadow-2xl overflow-hidden" id="questionCard">
+                <div class="p-6 md:p-8">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg"
+                            id="qBadge">1</div>
+                        <p id="questionText"
+                            class="text-lg md:text-xl font-semibold text-gray-800 leading-relaxed pt-2">Loading...</p>
+                    </div>
+                    <div id="optionsContainer" class="space-y-3"></div>
+                </div>
+                <div class="px-6 md:px-8 pb-6 md:pb-8">
+                    <div class="flex gap-3">
+                        <button id="prevBtn"
+                            class="flex-1 py-3 px-6 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all disabled:opacity-50"
+                            disabled>← Trước</button>
+                        <button id="nextBtn"
+                            class="flex-1 py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all">Tiếp
+                            →</button>
+                        <button id="submitBtn"
+                            class="hidden flex-1 py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all">✓
+                            Nộp bài</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 mt-6 shadow-lg">
+                <div class="text-sm text-gray-500 mb-3 font-medium">Điều hướng câu hỏi:</div>
+                <div id="questionNav" class="flex flex-wrap gap-2"></div>
+            </div>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="resultScreen" class="hidden">
+            <div class="glass-card rounded-3xl shadow-2xl overflow-hidden">
+                <div id="resultHeader" class="p-8 text-center gradient-bg">
+                    <div class="relative inline-block mb-4">
+                        <div class="w-32 h-32 rounded-full score-circle flex items-center justify-center"
+                            style="--score-percent: 0deg;">
+                            <div class="w-28 h-28 bg-white rounded-full flex flex-col items-center justify-center">
+                                <span id="scoreDisplay" class="text-4xl font-extrabold text-indigo-600">0</span>
+                                <span class="text-gray-400 text-sm">/10 điểm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 id="resultTitle" class="text-2xl font-bold text-white mb-2">Kết quả</h2>
+                    <p id="resultMessage" class="text-indigo-100">Đang tính điểm...</p>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-100">
+                            <div class="text-2xl mb-1">✅</div>
+                            <div id="correctCount" class="text-2xl font-bold text-emerald-600">0</div>
+                            <div class="text-xs text-gray-500">Đúng</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-2xl border-2 border-red-100">
+                            <div class="text-2xl mb-1">❌</div>
+                            <div id="incorrectCount" class="text-2xl font-bold text-red-500">0</div>
+                            <div class="text-xs text-gray-500">Sai</div>
+                        </div>
+                        <div class="text-center p-4 bg-indigo-50 rounded-2xl border-2 border-indigo-100">
+                            <div class="text-2xl mb-1">📊</div>
+                            <div id="percentDisplay" class="text-2xl font-bold text-indigo-600">0%</div>
+                            <div class="text-xs text-gray-500">Tỷ lệ</div>
+                        </div>
+                    </div>
+                    <div id="submitStatus" class="text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium"></div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                        <p class="text-blue-800 text-sm text-center">
+                            📋 Đáp án chi tiết sẽ được giáo viên thông báo sau buổi kiểm tra.
+                        </p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                        <p class="text-emerald-800 text-sm text-center">
+                            📱 Kết quả đã được gửi về số điện thoại phụ huynh: <strong id="resultPhone">---</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center mt-8 text-indigo-300/60 text-sm">
+            <p>© 2026 Ezteach - Thầy Võ Ngọc Tùng</p>
+            <p class="mt-1">
+                <a href="https://zalo.me/0914666040" class="hover:text-indigo-300">💬 Zalo</a>
+                <span class="mx-2">•</span>
+                <a href="https://facebook.com/vongoctungthcs" class="hover:text-indigo-300">📘 Facebook</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ╔════════════════════════════════════════════════════════════════╗
+        // ║                     CẤU HÌNH BÀI KIỂM TRA                      ║
+        // ║        THAY ĐỔI CÁC GIÁ TRỊ DƯỚI ĐÂY CHO MỖI ĐỀ MỚI           ║
+        // ╚════════════════════════════════════════════════════════════════╝
+
+        // ===== 1. GOOGLE SHEETS URL =====
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7djr4nJB1kjZ4JnjcTA32zuCoL34wAdll9AqTn2hsLAyEcIq_eURiXVyrMW_DsBzm/exec';
+
+        // ===== 2. THỜI GIAN LÀM BÀI =====
+        const QUIZ_TIME = 15 * 60; // 15 phút
+
+        // ===== 3. KHÔNG KHÓA THỜI GIAN - LUÔN MỞ =====
+        const SCHEDULE_ENABLED = false; // Đặt true để bật khóa thời gian
+        const OPEN_TIME = new Date('2026-02-08T19:00:00+07:00');
+        const CLOSE_TIME = new Date('2026-02-08T19:30:00+07:00');
+
+        // ===== 4. CÂU HỎI TRẮC NGHIỆM =====
+        // Unit 7: Natural Wonders of the World (10 câu)
+        // Unit 8: Tourism (10 câu)
+        const quizData = [
+            // UNIT 7 - A Closer Look 1 (Từ vựng)
+            { id: 1, question: "A place that is extremely beautiful and that seems perfect is called a ______.", options: ["landscape", "paradise", "monument", "destination"], correct: 1 },
+            { id: 2, question: "There is a(n) ______ need to preserve biological diversity of our national parks.", options: ["annual", "diverse", "urgent", "located"], correct: 2 },
+            { id: 3, question: "The government encourages people to protect the ______ of their communities.", options: ["diversity", "hesitation", "permit", "urgency"], correct: 0 },
+
+            // UNIT 7 - A Closer Look 2 (Ngữ pháp - Reported Speech)
+            { id: 4, question: "\"Will pollution endanger the wildlife here?\" Kate asked. → Kate asked if pollution ______ the wildlife there.", options: ["will endanger", "would endanger", "endangered", "had endangered"], correct: 1 },
+            { id: 5, question: "\"Is Ganh Da Dia in Phu Yen Province?\" → She asked Phong ______ Ganh Da Dia was in Phu Yen Province.", options: ["if", "that", "what", "where"], correct: 0 },
+            { id: 6, question: "\"Can I take a photo inside the cave?\" he said to the guide. → He asked the guide ______ take a photo inside the cave.", options: ["if he can", "if he could", "whether can he", "that he could"], correct: 1 },
+
+            // UNIT 7 - Looking Back
+            { id: 7, question: "I'm sure you will be amazed by the ______ of the Atacama Desert.", options: ["landscape", "backdrop", "territory", "land"], correct: 0 },
+            { id: 8, question: "He ______ before sending the e-mail because he was afraid that she would not like it.", options: ["possessed", "hesitated", "accepted", "admired"], correct: 1 },
+            { id: 9, question: "Minh asked me ______ I knew much about the Amazon Rainforest.", options: ["did", "if", "what", "where"], correct: 1 },
+            { id: 10, question: "The teacher asked Liam ______ he wanted to visit Son Doong Cave.", options: ["whether", "did", "do", "what"], correct: 0 },
+
+            // UNIT 8 - A Closer Look 1 (Từ vựng)
+            { id: 11, question: "A plan of a journey, including the route and the places that you visit, is called a ______.", options: ["package holiday", "homestay", "trip itinerary", "ticket"], correct: 2 },
+            { id: 12, question: "If you take a(n) ______ holiday, you have to follow a fixed itinerary.", options: ["self-guided", "package", "individual", "independent"], correct: 1 },
+            { id: 13, question: "We'd like to go on a(n) ______ tour which will be interesting and be within our budget.", options: ["expensive", "self-guided", "luxurious", "business"], correct: 1 },
+
+            // UNIT 8 - A Closer Look 2 (Ngữ pháp - Relative Pronouns)
+            { id: 14, question: "People ______ travel abroad usually use travel apps.", options: ["which", "who", "whose", "whom"], correct: 1 },
+            { id: 15, question: "They want to visit a city ______ is famous for its rich history.", options: ["who", "whose", "which", "where"], correct: 2 },
+            { id: 16, question: "The man ______ book you are reading is my friend.", options: ["who", "whom", "which", "whose"], correct: 3 },
+
+            // UNIT 8 - Looking Back
+            { id: 17, question: "If you are travelling abroad for the first time, it's better to look for a good travel ______ to arrange everything for you.", options: ["budget", "agency", "homestay", "tourism"], correct: 1 },
+            { id: 18, question: "Young people are usually good at ______ for cheap transportation and accommodation.", options: ["buying", "booking", "hunting", "applying"], correct: 2 },
+            { id: 19, question: "We can ask my uncle ______ has a lot of experience in organising tours.", options: ["which", "who", "whose", "whom"], correct: 1 },
+            { id: 20, question: "The police officer is talking to the tourist ______ passport is missing.", options: ["who", "which", "that", "whose"], correct: 3 }
+        ];
+
+        // ╔════════════════════════════════════════════════════════════════╗
+        // ║              KHÔNG CẦN SỬA CODE PHÍA DƯỚI                      ║
+        // ╚════════════════════════════════════════════════════════════════╝
+
+        // ===== STATE =====
+        let state = { name: '', className: '', parentPhone: '', current: 0, answers: {}, submitted: false };
+        let timeLeft = QUIZ_TIME;
+        let timerInterval = null;
+        let countdownInterval = null;
+
+        // ===== DOM =====
+        const $ = id => document.getElementById(id);
+        const lockedScreen = $('lockedScreen');
+        const expiredScreen = $('expiredScreen');
+        const startScreen = $('startScreen');
+        const quizScreen = $('quizScreen');
+        const resultScreen = $('resultScreen');
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSchedule();
+            $('studentForm').onsubmit = handleStart;
+            $('prevBtn').onclick = () => navigate(-1);
+            $('nextBtn').onclick = () => navigate(1);
+            $('submitBtn').onclick = handleSubmit;
+        });
+
+        // ===== SCHEDULE CHECK =====
+        function checkSchedule() {
+            // Nếu tắt khóa thời gian, luôn cho phép vào làm bài
+            if (!SCHEDULE_ENABLED) { showScreen('start'); return; }
+
+            const now = new Date();
+            if (now < OPEN_TIME) { showScreen('locked'); startCountdown(); }
+            else if (now > CLOSE_TIME) { showScreen('expired'); }
+            else { showScreen('start'); }
+        }
+
+        function showScreen(screen) {
+            lockedScreen.classList.add('hidden');
+            expiredScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+
+            if (screen === 'locked') lockedScreen.classList.remove('hidden');
+            else if (screen === 'expired') expiredScreen.classList.remove('hidden');
+            else if (screen === 'start') startScreen.classList.remove('hidden');
+            else if (screen === 'quiz') quizScreen.classList.remove('hidden');
+            else if (screen === 'result') resultScreen.classList.remove('hidden');
+        }
+
+        function startCountdown() {
+            updateCountdown();
+            countdownInterval = setInterval(() => {
+                const now = new Date();
+                if (now >= OPEN_TIME) { clearInterval(countdownInterval); checkSchedule(); }
+                else { updateCountdown(); }
+            }, 1000);
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = OPEN_TIME - now;
+            if (diff <= 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            let display = '';
+            if (days > 0) display += `${days} ngày `;
+            display += `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            $('countdownDisplay').textContent = display;
+        }
+
+        function handleStart(e) {
+            e.preventDefault();
+            // Chỉ kiểm tra thời gian nếu bật khóa
+            if (SCHEDULE_ENABLED) {
+                const now = new Date();
+                if (now < OPEN_TIME || now > CLOSE_TIME) { checkSchedule(); return; }
+            }
+
+            state.name = $('studentName').value.trim();
+            state.className = $('studentClass').value.trim();
+            state.parentPhone = $('parentPhone').value.trim();
+
+            if (!state.name || !state.className) return alert('Vui lòng nhập đầy đủ thông tin!');
+            if (!state.parentPhone || !/^[0-9]{10,11}$/.test(state.parentPhone)) {
+                return alert('Vui lòng nhập số điện thoại phụ huynh hợp lệ (10-11 số)!');
+            }
+
+            $('dispName').textContent = state.name;
+            $('dispClass').textContent = 'Lớp ' + state.className;
+            initNav();
+            render();
+            startTimer();
+            showScreen('quiz');
+        }
+
+        // ===== TIMER =====
+        function startTimer() {
+            timeLeft = QUIZ_TIME;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) { clearInterval(timerInterval); autoSubmit(); }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const display = $('timerDisplay');
+            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            const percent = (timeLeft / QUIZ_TIME) * 100;
+            $('timerBar').style.width = percent + '%';
+
+            if (timeLeft <= 60) {
+                display.className = 'text-2xl font-bold text-red-600 timer-warning';
+                $('timerBar').className = 'h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all duration-1000';
+            } else if (timeLeft <= 180) {
+                display.className = 'text-2xl font-bold text-amber-600';
+                $('timerBar').className = 'h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-1000';
+            }
+        }
+
+        function autoSubmit() {
+            if (state.submitted) return;
+            alert('⏰ Hết giờ! Bài làm của bạn đã được tự động nộp.');
+            state.submitted = true;
+            showResults();
+        }
+
+        function initNav() {
+            const nav = $('questionNav');
+            nav.innerHTML = '';
+            quizData.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-9 h-9 rounded-lg font-semibold text-sm border-2 border-gray-200 bg-white text-gray-600 hover:border-indigo-400 hover:bg-indigo-50 transition-all';
+                btn.textContent = i + 1;
+                btn.onclick = () => { state.current = i; render(); };
+                nav.appendChild(btn);
+            });
+        }
+
+        function updateNav() {
+            Array.from($('questionNav').children).forEach((btn, i) => {
+                btn.className = 'w-9 h-9 rounded-lg font-semibold text-sm border-2 transition-all ';
+                if (i === state.current) btn.className += 'bg-indigo-600 text-white border-indigo-600';
+                else if (state.answers[i] !== undefined) btn.className += 'bg-emerald-500 text-white border-emerald-500';
+                else btn.className += 'bg-white text-gray-600 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50';
+            });
+        }
+
+        function render() {
+            const q = quizData[state.current];
+            const total = quizData.length;
+
+            $('qNum').textContent = state.current + 1;
+            $('qBadge').textContent = state.current + 1;
+            $('currentQ').textContent = state.current + 1;
+            $('questionText').textContent = q.question;
+            $('progressBar').style.width = ((state.current + 1) / total * 100) + '%';
+
+            const container = $('optionsContainer');
+            container.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full p-4 text-left rounded-xl border-2 border-gray-200 flex items-center gap-4 bg-white';
+                if (state.answers[state.current] === i) btn.classList.add('selected');
+                btn.innerHTML = `<span class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-gray-600">${letters[i]}</span><span class="font-medium text-gray-700">${opt}</span>`;
+                btn.onclick = () => { if (!state.submitted) { state.answers[state.current] = i; render(); } };
+                container.appendChild(btn);
+            });
+
+            $('prevBtn').disabled = state.current === 0;
+            $('nextBtn').classList.toggle('hidden', state.current === total - 1);
+            $('submitBtn').classList.toggle('hidden', state.current !== total - 1);
+            updateNav();
+        }
+
+        function navigate(dir) {
+            const newIdx = state.current + dir;
+            if (newIdx >= 0 && newIdx < quizData.length) { state.current = newIdx; render(); }
+        }
+
+        function handleSubmit() {
+            const answered = Object.keys(state.answers).length;
+            if (answered < quizData.length && !confirm(`Bạn còn ${quizData.length - answered} câu chưa trả lời. Nộp bài?`)) return;
+            if (answered === quizData.length && !confirm('Bạn có chắc muốn nộp bài?')) return;
+
+            clearInterval(timerInterval);
+            state.submitted = true;
+            showResults();
+        }
+
+        function showResults() {
+            let correct = 0;
+            quizData.forEach((q, i) => { if (state.answers[i] === q.correct) correct++; });
+
+            const total = quizData.length;
+            const score = (correct / total * 10).toFixed(1);
+            const percent = Math.round(correct / total * 100);
+
+            $('scoreDisplay').textContent = score;
+            $('correctCount').textContent = correct;
+            $('incorrectCount').textContent = total - correct;
+            $('percentDisplay').textContent = percent + '%';
+            $('resultPhone').textContent = state.parentPhone;
+
+            setTimeout(() => {
+                document.querySelector('.score-circle').style.setProperty('--score-percent', (correct / total * 360) + 'deg');
+            }, 100);
+
+            const header = $('resultHeader');
+            let title, msg, gradient;
+            if (parseFloat(score) >= 9) { title = '🏆 Xuất sắc!'; msg = 'Tuyệt vời! Bạn đã làm chủ kiến thức!'; gradient = 'bg-gradient-to-br from-amber-400 to-orange-500'; createConfetti(); }
+            else if (parseFloat(score) >= 7) { title = '🌟 Giỏi lắm!'; msg = 'Kết quả rất tốt!'; gradient = 'bg-gradient-to-br from-emerald-400 to-teal-500'; }
+            else if (parseFloat(score) >= 5) { title = '👍 Khá tốt!'; msg = 'Cố gắng ôn tập thêm nhé!'; gradient = 'bg-gradient-to-br from-blue-400 to-indigo-500'; }
+            else { title = '💪 Cần cố gắng!'; msg = 'Hãy xem lại bài học và thử lại!'; gradient = 'bg-gradient-to-br from-pink-400 to-rose-500'; }
+
+            $('resultTitle').textContent = title;
+            $('resultMessage').textContent = msg;
+            header.className = 'p-8 text-center ' + gradient;
+
+            showScreen('result');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            sendToSheet(state.name, state.className, state.parentPhone, score);
+        }
+
+        function createConfetti() {
+            const colors = ['#6366f1', '#8b5cf6', '#a855f7', '#ec4899', '#f43f5e', '#10b981', '#f59e0b'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 4000);
+                }, i * 50);
+            }
+        }
+
+        async function sendToSheet(name, className, parentPhone, score) {
+            const status = $('submitStatus');
+            status.textContent = '⏳ Đang gửi kết quả...';
+            status.className = 'text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium bg-blue-100 text-blue-700';
+
+            if (GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                status.textContent = '⚠️ Chưa cấu hình Google Sheets';
+                status.className = 'text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium bg-amber-100 text-amber-700';
+                return;
+            }
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, className, parentPhone, score })
+                });
+                status.textContent = '✅ Đã lưu kết quả thành công!';
+                status.className = 'text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium bg-emerald-100 text-emerald-700';
+            } catch (e) {
+                status.textContent = '⚠️ Không thể lưu kết quả';
+                status.className = 'text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium bg-amber-100 text-amber-700';
+            }
+        }
+    </script>
+</body>
+
+</html>
