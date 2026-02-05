@@ -371,6 +371,10 @@
         const OPEN_TIME = new Date('2026-02-08T19:00:00+07:00');
         const CLOSE_TIME = new Date('2026-02-08T19:30:00+07:00');
 
+        // ===== 4. CHỈ CHO LÀM 1 LẦN =====
+        const ONE_TIME_ONLY = true; // true = chỉ làm 1 lần, false = làm nhiều lần
+        const QUIZ_ID = 'quiz-global9-unit7-8'; // ID duy nhất cho mỗi bài quiz
+
         // ===== 4. CÂU HỎI TRẮC NGHIỆM =====
         // Unit 7: Natural Wonders of the World (10 câu)
         // Unit 8: Tourism (10 câu)
@@ -437,6 +441,12 @@
 
         // ===== SCHEDULE CHECK =====
         function checkSchedule() {
+            // Kiểm tra nếu đã làm bài rồi
+            if (ONE_TIME_ONLY && localStorage.getItem('completed_' + QUIZ_ID)) {
+                showAlreadyCompleted();
+                return;
+            }
+
             // Nếu tắt khóa thời gian, luôn cho phép vào làm bài
             if (!SCHEDULE_ENABLED) { showScreen('start'); return; }
 
@@ -444,6 +454,39 @@
             if (now < OPEN_TIME) { showScreen('locked'); startCountdown(); }
             else if (now > CLOSE_TIME) { showScreen('expired'); }
             else { showScreen('start'); }
+        }
+
+        // Hiển thị thông báo đã làm bài
+        function showAlreadyCompleted() {
+            const savedData = JSON.parse(localStorage.getItem('completed_' + QUIZ_ID) || '{}');
+            const completedHTML = `
+                <div class="glass-card rounded-3xl shadow-2xl overflow-hidden">
+                    <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-8 text-center">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-4">
+                            <span class="text-4xl">✅</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Bạn đã hoàn thành bài kiểm tra</h2>
+                        <p class="text-amber-100">Mỗi học sinh chỉ được làm 1 lần</p>
+                    </div>
+                    <div class="p-8 text-center">
+                        <div class="bg-emerald-50 rounded-2xl p-6 mb-6">
+                            <div class="text-lg text-gray-600 mb-2">📊 Kết quả của bạn:</div>
+                            <div class="text-4xl font-extrabold text-emerald-600 mb-2">${savedData.score || '?'}/10</div>
+                            <div class="text-sm text-gray-500">Họ tên: ${savedData.name || '---'}</div>
+                            <div class="text-sm text-gray-500">Thời gian: ${savedData.time || '---'}</div>
+                        </div>
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                            <p class="text-blue-800 text-sm">
+                                📋 Nếu bạn muốn làm lại, vui lòng liên hệ giáo viên.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex gap-3 justify-center">
+                            <a href="https://zalo.me/0914666040" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all">💬 Liên hệ Zalo</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.querySelector('.container').innerHTML = document.querySelector('header').outerHTML + completedHTML + document.querySelector('footer').outerHTML;
         }
 
         function showScreen(screen) {
@@ -639,6 +682,17 @@
             $('resultTitle').textContent = title;
             $('resultMessage').textContent = msg;
             header.className = 'p-8 text-center ' + gradient;
+
+            // Lưu kết quả vào localStorage để ngăn làm lại
+            if (ONE_TIME_ONLY) {
+                const now = new Date();
+                const timeStr = now.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+                localStorage.setItem('completed_' + QUIZ_ID, JSON.stringify({
+                    name: state.name,
+                    score: score,
+                    time: timeStr
+                }));
+            }
 
             showScreen('result');
             window.scrollTo({ top: 0, behavior: 'smooth' });
