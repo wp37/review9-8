@@ -361,7 +361,7 @@
         // ╚════════════════════════════════════════════════════════════════╝
 
         // ===== 1. GOOGLE SHEETS URL =====
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7djr4nJB1kjZ4JnjcTA32zuCoL34wAdll9AqTn2hsLAyEcIq_eURiXVyrMW_DsBzm/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzV8ZHdGPRPGb2c2DRMETvCi3pg__ge-QZwKnmRI44sTooSLbk9j2GtyjuXJLjYv9Zj/exec';
 
         // ===== 2. THỜI GIAN LÀM BÀI =====
         const QUIZ_TIME = 15 * 60; // 15 phút
@@ -671,12 +671,29 @@
                 return;
             }
 
+            // Tính số câu đúng và thời gian làm bài
+            let correctCount = 0;
+            quizData.forEach((q, i) => { if (state.answers[i] === q.correct) correctCount++; });
+
+            const timeUsedSeconds = QUIZ_TIME - timeLeft;
+            const mins = Math.floor(timeUsedSeconds / 60);
+            const secs = timeUsedSeconds % 60;
+            const timeUsed = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, className, parentPhone, score })
+                    body: JSON.stringify({
+                        name: name,
+                        className: className,
+                        parentPhone: parentPhone,
+                        score: score,
+                        correctCount: correctCount,
+                        totalQuestions: quizData.length,
+                        timeUsed: timeUsed
+                    })
                 });
                 status.textContent = '✅ Đã lưu kết quả thành công!';
                 status.className = 'text-center mb-4 py-2 px-4 rounded-lg text-sm font-medium bg-emerald-100 text-emerald-700';
